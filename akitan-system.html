@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<title>Schedule Checker</title>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    background: #44CAD1;
+    color: #000;
+    padding: 20px;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+  }
+
+  .calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .cell {
+    background: #fff;
+    border-radius: 12px;
+    padding: 10px 6px;
+    text-align: center;
+    min-height: 90px;
+  }
+
+  .date {
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+
+  .mark {
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+
+  .circle { color: #4caf50; }
+  .cross { color: #f44336; }
+
+  .work {
+    font-size: 13px;
+    opacity: 0.85;
+  }
+
+  .empty {
+    background: transparent;
+  }
+</style>
+</head>
+<body>
+
+<h1>🐶2026 February💉</h1>
+
+<div class="calendar" id="calendar"></div>
+
+<script>
+const schedule = {
+  1: '日勤',
+  2: '日勤',
+  3: '研修',
+  4: '夜勤入り',
+  5: '休み',
+  6: '休み',
+  7: '日勤',
+  8: '日勤',
+  9: '休み',
+  10: '休み',
+  11: '日勤',
+  12: '夜勤入り',
+  13: '夜勤入り',
+  14: '日勤',
+  15: '日勤',
+  16: '日勤',
+  17: '日勤',
+  18: '日勤',
+  19: '休み',
+  20: '休み',
+  21: '日勤',
+};
+
+const daysInMonth = 28;
+const startDay = 0; // 月曜始まり（0=月）
+
+const calendar = document.getElementById('calendar');
+
+// 月初までの空白
+for (let i = 0; i < startDay; i++) {
+  calendar.appendChild(document.createElement('div')).className = 'cell empty';
+}
+
+function judge(day) {
+  const today = schedule[day];
+  const next = schedule[day + 1];
+
+  if (!today) return '';
+
+  if (
+    (today === '夜勤入り' && next) ||
+    (next === '休み') ||
+    (next === '研修')
+  ) {
+    return '○';
+  }
+
+  if (next === '日勤' || next === '夜勤入り') {
+    return '×';
+  }
+
+  return '';
+}
+
+for (let day = 1; day <= daysInMonth; day++) {
+  const cell = document.createElement('div');
+  cell.className = 'cell';
+
+  const mark = judge(day);
+  const work = schedule[day] || '';
+
+  cell.innerHTML = `
+    <div class="date">${day}</div>
+    <div class="mark ${mark === '○' ? 'circle' : 'cross'}">${mark}</div>
+    <div class="work">${work}</div>
+  `;
+
+  calendar.appendChild(cell);
+}
+</script>
+
+</body>
+</html>
