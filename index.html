@@ -109,20 +109,15 @@ const schedule = {
 
 const stamps = {};
 
+const year = 2026;
+const month = 1;
 
-const daysInMonth = 28;
+const firstDay = new Date(year, month, 1).getDay();
+const startDay = (firstDay + 6) % 7;
 
-  const year = 2026;
-const month = 1; // 0=1月, 1=2月
-
-const firstDay = new Date(year, month, 1).getDay(); 
-const startDay = (firstDay + 6) % 7; // 月曜始まり変換
-
-  
+const daysInMonth = new Date(year, month + 1, 0).getDate();
 
 const calendar = document.getElementById('calendar');
-
-
 
 function judge(day) {
   const today = schedule[day];
@@ -130,94 +125,19 @@ function judge(day) {
 
   if (!today) return '';
 
-   if (next === '休み' || next === '研修') {
-    return '○';
-  }
-
-
-
-  if (next === '日勤' || next === '夜勤入り') {
-    return '×';
-  }
+  if (next === '休み' || next === '研修') return '○';
+  if (next === '日勤' || next === '夜勤入り') return '×';
 
   return '';
 }
 
-  function renderCalendar() {
+function renderCalendar() {
   calendar.innerHTML = '';
 
+  // 月初空白
   for (let i = 0; i < startDay; i++) {
-    calendar.appendChild(document.createElement('div')).className = 'cell empty';
-  }
+    const empty = document.c
 
-  for (let day = 1; day <= daysInMonth; day++) {
-    const cell = document.createElement('div');
-    cell.className = 'cell';
-
-    const mark = judge(day);
-    const work = schedule[day] || '';
-    const stamp = stamps[day] || '';
-
-    let stampIcon = '';
-    if (stamp === 'home') stampIcon = '💚';
-    if (stamp === 'aki') stampIcon = '🩵';
-    if (stamp === 'date') stampIcon = '💖';
-
-    cell.innerHTML = `
-      <div class="date">${day}</div>
-      <div class="mark ${mark === '○' ? 'circle' : 'cross'}">${mark}</div>
-      <div class="work">${work}</div>
-      <div style="font-size:18px;">${stampIcon}</div>
-    `;
-
-    cell.addEventListener('click', () => {
-      const current = stamps[day];
-
-      if (!current) stamps[day] = 'home';
-      else if (current === 'home') stamps[day] = 'aki';
-      else if (current === 'aki') stamps[day] = 'date';
-      else delete stamps[day];
-
-      renderCalendar();
-    });
-
-    calendar.appendChild(cell);
-  }
-}
-
-
-for (let day = 1; day <= daysInMonth; day++) {
-  const cell = document.createElement('div');
-  cell.className = 'cell';
-
-  const mark = judge(day);
-  const work = schedule[day] || '';
-
-  cell.innerHTML = `
-    <div class="date">${day}</div>
-    <div class="mark ${mark === '○' ? 'circle' : 'cross'}">${mark}</div>
-    <div class="work">${work}</div>
-  `;
-
-  calendar.appendChild(cell);
-}
-
-  cell.addEventListener('click', () => {
-  const current = stamps[day];
-
-  // 切り替え順番
-  if (!current) {
-    stamps[day] = 'home';        // こうみ家
-  } else if (current === 'home') {
-    stamps[day] = 'aki';         // あき家
-  } else if (current === 'aki') {
-    stamps[day] = 'date';        // デート
-  } else {
-    delete stamps[day];          // リセット
-  }
-
-  renderCalendar();
-});
 
 </script>
 
