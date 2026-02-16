@@ -18,6 +18,11 @@
   }
 
   .week-header .cell {
+     position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #44CAD1;
+  padding-bottom: 8px;
   background: transparent;
   font-weight: bold;
   min-height: auto;
@@ -39,7 +44,15 @@
     text-align: center;
     min-height: 90px;
   }
+  
+.today {
+  border: 3px solid #ff9800;
+  box-shadow: 0 0 12px rgba(255,152,0,0.6);
+  transform: scale(1.03);
+}
 
+
+  
   .date {
     font-weight: bold;
     margin-bottom: 6px;
@@ -159,6 +172,16 @@ function renderCalendar() {
   for (let day = 1; day <= daysInMonth; day++) {
     const cell = document.createElement('div');
     cell.className = 'cell';
+
+    const now = new Date();
+const isToday =
+  now.getFullYear() === year &&
+  now.getMonth() === month &&
+  now.getDate() === day;
+
+if (isToday) {
+  cell.classList.add('today');
+}
 
     const mark = judge(day);
     const work = schedule[day] || '';
