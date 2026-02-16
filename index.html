@@ -83,11 +83,12 @@
 <div class="calendar" id="calendar"></div>
 
 <script>
-const stamps = {
-  1: 'home',   
-  5: 'aki',    
-  14: 'date'   
+const stamps = JSON.parse(localStorage.getItem('stamps')) || {
+  1: 'home',
+  5: 'aki',
+  14: 'date'
 };
+
 
 const schedule = {
   1: '日勤',
