@@ -83,6 +83,12 @@
 <div class="calendar" id="calendar"></div>
 
 <script>
+const stamps = {
+  1: 'home',   
+  5: 'aki',    
+  14: 'date'   
+};
+
 const schedule = {
   1: '日勤',
   2: '日勤',
@@ -106,19 +112,6 @@ const schedule = {
   20: '休み',
   21: '日勤',
 };
-
-  
-
-const stamps = JSON.parse(localStorage.getItem('stamps'))<script>
-// ここを変更！
-const stamps = {
-  1: 'home',   // 1日 → こうみ家
-  5: 'aki',    // 5日 → あき家
-  14: 'date'   // 14日 → デート
-};
-</script>
- || {};
-
 
 const year = 2026;
 const month = 1;
