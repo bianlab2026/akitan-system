@@ -83,7 +83,8 @@
 <div class="calendar" id="calendar"></div>
 
 <script>
-const stamps = JSON.parse(localStorage.getItem('stamps')) || {
+// stampsの初期値
+const defaultStamps = {
   1: 'home',
   8: 'home',
   9: 'home',
@@ -93,6 +94,9 @@ const stamps = JSON.parse(localStorage.getItem('stamps')) || {
   19: 'home',
   20: 'home',
 };
+
+// ローカルストレージに保存があればそれを使う
+const stamps = Object.assign({}, defaultStamps, JSON.parse(localStorage.getItem('stamps')) || {});
 
 
 const schedule = {
