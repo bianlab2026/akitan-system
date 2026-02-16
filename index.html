@@ -131,7 +131,7 @@ function judge(day) {
   if (!today) return '';
 
   if (next === '休み' || next === '研修') return '○';
-  if (next === '日勤' || next === '夜勤入り') return '×';
+  if (next === '日勤' || next === '夜勤入り'|| today === '夜勤入り') return '×';
 
   return '';
 }
