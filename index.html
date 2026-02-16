@@ -1,229 +1,693 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8" />
-<title>Schedule Checker</title>
-<style>
-  body {
-    font-family: system-ui, sans-serif;
-    background: #44CAD1;
-    color: #000;
-    padding: 20px;
+<!doctype html>
+<html lang="ja" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GENDERLESS HAIR BOOK</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Outfit:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        display: ['Outfit', 'sans-serif'],
+        body: ['Zen Kaku Gothic New', 'sans-serif']
+      }
+    }
   }
+}
+</script>
+  <style>
+html, body { height: 100%; margin: 0; }
 
-  #calendar {
-  max-height: 70vh;
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #555; border-radius: 2px; }
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes tagIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-fade-up {
+  animation: fadeUp 0.5s ease forwards;
+  opacity: 0;
+}
+.animate-modal { animation: modalIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-backdrop { animation: backdropIn 0.25s ease forwards; }
+.animate-tag { animation: tagIn 0.3s ease forwards; }
+
+/* Card hover */
+.stylist-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.stylist-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+}
+
+/* Filter chip */
+.filter-chip {
+  transition: all 0.2s ease;
+}
+.filter-chip:hover {
+  transform: scale(1.03);
+}
+.filter-chip.active {
+  box-shadow: 0 0 0 2px #e0d5c1;
+}
+
+/* Dropdown styling */
+.dropdown-panel {
+  max-height: 260px;
   overflow-y: auto;
 }
+.dropdown-panel::-webkit-scrollbar { width: 3px; }
+.dropdown-panel::-webkit-scrollbar-thumb { background: #888; border-radius: 2px; }
 
-  h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    letter-spacing: 1px;
-  }
-
- .week-header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background: #44CAD1;
-  padding-bottom: 8px;
+/* SNS button pulse */
+.sns-btn {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-
-.week-header .cell {
-  background: transparent;
-  font-weight: bold;
-  min-height: auto;
+.sns-btn:hover {
+  transform: scale(1.12);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
 }
-
-
-  
-  .calendar {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
-    max-width: 700px;
-    margin: 0 auto;
-  }
-
-  .cell {
-    background: #fff;
-    border-radius: 12px;
-    padding: 10px 6px;
-    text-align: center;
-    min-height: 90px;
-  }
-  
-.today {
-  background: #ff1744;
-  color: white;
-  border: none;
-  transform: scale(1.05);
-}
-
-.today .date {
-  font-size: 20px;
-}
-
-
-
-  
-  .date {
-    font-weight: bold;
-    margin-bottom: 6px;
-  }
-
-  .mark {
-    font-size: 20px;
-    margin-bottom: 6px;
-  }
-
-  .circle { color: #4caf50; }
-  .cross { color: #f44336; }
-
-  .work {
-    font-size: 13px;
-    opacity: 0.85;
-  }
-
-  .empty {
-    background: transparent;
-  }
 </style>
-</head>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+	
+	
+	  <!-- 全体背景 -->
+ <body class="h-full">
+  <div id="app" class="w-full h-full overflow-auto" style="background: linear-gradient(0deg, #E8EDFF 0%, #E8EDFF 50%, #494FB7 80%); color: #FFFFFF; font-family: 'Zen Kaku Gothic New', sans-serif;">
+	  
+	  <!-- Header -->
+   <header class="w-full relative overflow-visible">
+  <img 
+    src="https://storage.googleapis.com/studio-design-asset-files/projects/ogO06Y25a2/s-574x292_webp_81a9df05-bfe3-4189-afc7-0dfd211d7632.png" 
+    alt="タイプヘッダー画像"
+    class="w-full max-w-xs h-auto mx-auto mt-4"
+  >
+</header>
 
-  
-<body>
+   <main class="w-full px-3 pb-8" style="max-width: 640px; margin: 0 auto;">
+	   <!-- Filter Section -->
+    <section class="mt-6">
+		<!-- Genre Filter -->
+     <div class="flex gap-2 mb-3"><button id="btnAll" class="filter-chip active px-4 py-2 rounded-full text-xs font-medium" style="background: #FF67CD; color: #FFFFFF;"  onclick="setGenre('all')">
+		 All</button> 
+		 
+		 <button id="btnMens" class="filter-chip px-4 py-2 rounded-full text-xs font-medium" style="background: #94B7EF; color: #4072C2;" onclick="setGenre('メンズカット')">
+			 メンズカット</button> 
+		 
+		 <button id="btnChusei" class="filter-chip px-4 py-2 rounded-full text-xs font-medium" style="background: #94B7EF; color: #4072C2;" onclick="setGenre('中性')">
+			 中性 </button>
+     </div>
+		
+		<!-- Area Filter -->
+     <div class="relative mb-4"><button id="areaDropdownBtn" class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs" style="background: #FFFFFF; color: #4072C2; border: 1px solid #494FB7;" onclick="toggleAreaDropdown()"> <span id="areaDropdownLabel">エリアを選択</span>
+       <svg class="w-4 h-4 transition-transform" id="areaArrow" viewbox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" />
+       </svg></button>
+      <div id="areaDropdown" class="hidden absolute z-30 mt-1 w-full rounded-xl shadow-2xl dropdown-panel" style="background: #C4DBFF; border: 1px solid #4072C2;">
+       <div class="p-3 grid grid-cols-3 gap-1" id="areaGrid"></div>
+      </div>
+     </div><!-- Active Conditions -->
+     <div id="activeConditions" class="flex flex-wrap gap-1.5 mb-4 min-h-[28px]"><span class="animate-tag inline-flex items-center px-3 py-1 rounded-full text-xs font-medium" style="background: #FFFFFF; color: #A79DD0; border: 1px solid #FFFFFF;">All</span>
+     </div>
+    </section><!-- Results Count -->
+    <div class="flex items-center justify-between mb-4">
+     <p id="resultCount" class="text-xs" style="color: #272729;"></p>
+    </div><!-- Grid -->
+    <div id="stylistGrid" class="grid grid-cols-2 gap-3"></div><!-- No results -->
+    <div id="noResults" class="hidden text-center py-16">
+     <div class="text-4xl mb-3">
+      ✂️
+     </div>
+     <p class="text-sm" style="color: #272729;">条件に一致する美容師が見つかりません</p>
+    </div>
+   </main><!-- Modal Overlay -->
+   <div id="modalOverlay"
+     class="hidden fixed inset-0 z-50 flex items-center justify-center"
+     onclick="closeModal(event)">
+    <div id="modalContent" class="w-full overflow-y-auto rounded-t-2xl sm:rounded-2xl" style="max-width: 480px; max-height: 90%; background: #FFFFFF;" onclick="event.stopPropagation()"><!-- Modal inner content injected by JS -->
+    </div>
+   </div>
+  </div>
+	 
+	 
+	 
+  <script>
+// ----- DATA -----
+const PREFECTURES = [
+  "北海道","青森","岩手","宮城","秋田","山形","福島",
+  "茨城","栃木","群馬","埼玉","千葉","東京","神奈川",
+  "新潟","富山","石川","福井","山梨","長野","岐阜","静岡","愛知",
+  "三重","滋賀","京都","大阪","兵庫","奈良","和歌山",
+  "鳥取","島根","岡山","広島","山口",
+  "徳島","香川","愛媛","高知",
+  "福岡","佐賀","長崎","熊本","大分","宮崎","鹿児島","沖縄"
+];
 
-<h1>🐶2026 February💉</h1>
+const STYLISTS = [
+  {
+    id: 1,
+    name: "RYUKI",
+    genre: ["メンズカット","中性"],
+    area: "東京",
+    bio: "ジェンダーにとらわれない、あなただけのスタイルを。骨格と雰囲気を活かしたカットが得意です。",
+    headerImage: "images/header1.png", // ←ここ追加
+	iconImage: "images/icon1.png",
+    sns1: "#",
+    sns2: "#"
+  },
+	
+   {
+    id: 2,
+    name: "AOI",
+    genre: ["メンズカット","中性"],
+    area: "東京",
+    bio: "ジェンダーにとらわれない、あなただけのスタイルを。骨格と雰囲気を活かしたカットが得意です。",
+    headerImage: "images/header1.png", // ←ここ追加
+	iconImage: "images/icon1.png",
+    sns1: "#",
+    sns2: "#"
+  },
+	
+	
+  {
+    id: 3, name: "HARU", genre: ["メンズカット"], area: "福岡",
+    bio: "クリーンでモダンなメンズカット専門。フェードからマッシュまで幅広く対応。",
+    headerColor: "#2e2535", iconBg: "#a98fc4",
+    iconEmoji: "💈",
+    imageBg: "linear-gradient(135deg, #2e2535, #4a3a5a)",
+    sns1: "#", sns2: "#"
+  },
+  {
+    id: 4, name: "REN", genre: ["メンズカット","中性"], area: "京都",
+    bio: "伝統とモードの融合。京都から発信するジェンダーフリーなヘアスタイル。",
+    headerColor: "#352a2a", iconBg: "#c49a8f",
+    iconEmoji: "🎋",
+    imageBg: "linear-gradient(135deg, #352a2a, #5a3a3a)",
+    sns1: "#", sns2: "#"
+  },
+  {
+    id: 5, name: "MIKU", genre: ["中性"], area: "北海道",
+    bio: "透明感のあるスタイルが得意。あなたの「好き」を形にします。",
+    headerColor: "#252d35", iconBg: "#8fb5c4",
+    iconEmoji: "❄️",
+    imageBg: "linear-gradient(135deg, #252d35, #3a4a5a)",
+    sns1: "#", sns2: "#"
+  },
+  {
+    id: 6, name: "KAEDE", genre: ["メンズカット"], area: "愛知",
+    bio: "ストリートからビジネスまで。ON/OFFどちらも決まるスタイルをご提案。",
+    headerColor: "#35302a", iconBg: "#c4b08f",
+    iconEmoji: "🍂",
+    imageBg: "linear-gradient(135deg, #35302a, #5a4a3a)",
+    sns1: "#", sns2: "#"
+  }
+];
 
-  <div class="calendar week-header">
-  <div class="cell">月</div>
-  <div class="cell">火</div>
-  <div class="cell">水</div>
-  <div class="cell">木</div>
-  <div class="cell">金</div>
-  <div class="cell">土</div>
-  <div class="cell">日</div>
-</div>
+// ----- STATE -----
+let selectedGenres = []; // empty = all
+let selectedAreas = []; // empty = all
+let areaDropdownOpen = false;
 
-
-<div class="calendar" id="calendar"></div>
-
-<script>
-// stampsの初期値
-const defaultStamps = {
-  1: 'home',
-  8: 'home',
-  9: 'home',
-  10: 'home',
-  14: 'date',
-  16: 'aki',
-  19: 'home',
-  20: 'home',
-};
-
-// ローカルストレージに保存があればそれを使う
-const stamps = Object.assign({}, defaultStamps, JSON.parse(localStorage.getItem('stamps')) || {});
-
-
-const schedule = {
-  1: '日勤',
-  2: '日勤',
-  3: '日勤',
-  4: '夜勤入り',
-  5: '夜勤明け',
-  6: '休み',
-  7: '日勤',
-  8: '日勤',
-  9: '休み',
-  10: '休み',
-  11: '日勤',
-  12: '夜勤入り',
-  13: '夜勤明け',
-  14: '休み',
-  15: '日勤',
-  16: '日勤',
-  17: '日勤',
-  18: '日勤',
-  19: '休み',
-  20: '休み',
-  21: '日勤',
-};
-
-const year = 2026;
-const month = 1;
-
-const firstDay = new Date(year, month, 1).getDay();
-const startDay = (firstDay + 6) % 7;
-
-const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-const calendar = document.getElementById('calendar');
-
-function judge(day) {
-  const today = schedule[day];
-  const next = schedule[day + 1];
-
-  if (!today) return '';
-
-  if (next === '休み' || next === '研修') return '○';
-  if (next === '日勤' || next === '夜勤入り' || today === '夜勤入り') return '×';
-
-  return '';
+// ----- INIT AREA GRID -----
+function initAreaGrid() {
+  const grid = document.getElementById('areaGrid');
+  PREFECTURES.forEach(pref => {
+    const btn = document.createElement('button');
+    btn.className = 'area-item text-xs py-1.5 px-1 rounded-lg text-center transition-all';
+    btn.style.cssText = 'color: #a89a87; background: transparent;';
+    btn.dataset.pref = pref;
+    btn.textContent = pref;
+    btn.onclick = (e) => { e.stopPropagation(); toggleArea(pref); };
+    grid.appendChild(btn);
+  });
 }
 
-function renderCalendar() {
-  calendar.innerHTML = '';
+function toggleAreaDropdown() {
+  areaDropdownOpen = !areaDropdownOpen;
+  const dd = document.getElementById('areaDropdown');
+  const arrow = document.getElementById('areaArrow');
+  if (areaDropdownOpen) {
+    dd.classList.remove('hidden');
+    arrow.style.transform = 'rotate(180deg)';
+  } else {
+    dd.classList.add('hidden');
+    arrow.style.transform = 'rotate(0)';
+  }
+}
 
-  // 月初空白
-  for (let i = 0; i < startDay; i++) {
-       const empty = document.createElement('div');
-    empty.className = 'cell empty';
-    calendar.appendChild(empty);
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  if (areaDropdownOpen && !e.target.closest('#areaDropdownBtn') && !e.target.closest('#areaDropdown')) {
+    areaDropdownOpen = false;
+    document.getElementById('areaDropdown').classList.add('hidden');
+    document.getElementById('areaArrow').style.transform = 'rotate(0)';
+  }
+});
+
+function toggleArea(pref) {
+  const idx = selectedAreas.indexOf(pref);
+  if (idx > -1) { selectedAreas.splice(idx, 1); }
+  else { selectedAreas.push(pref); }
+  updateAreaUI();
+  renderAll();
+}
+
+function updateAreaUI() {
+  document.querySelectorAll('.area-item').forEach(btn => {
+    const active = selectedAreas.includes(btn.dataset.pref);
+    btn.style.background = active ? '#c4a87a33' : 'transparent';
+    btn.style.color = active ? '#c4a87a' : '#a89a87';
+    btn.style.border = active ? '1px solid #c4a87a66' : '1px solid transparent';
+  });
+  const label = document.getElementById('areaDropdownLabel');
+  if (selectedAreas.length === 0) {
+    label.textContent = 'エリアを選択';
+  } else if (selectedAreas.length <= 3) {
+    label.textContent = selectedAreas.join('・');
+  } else {
+    label.textContent = selectedAreas.slice(0,3).join('・') + ` 他${selectedAreas.length - 3}件`;
+  }
+}
+
+// ----- GENRE FILTER -----
+function setGenre(genre) {
+  if (genre === 'all') {
+    selectedGenres = [];
+  } else {
+    const idx = selectedGenres.indexOf(genre);
+    if (idx > -1) { selectedGenres.splice(idx, 1); }
+    else { selectedGenres.push(genre); }
+  }
+  updateGenreUI();
+  renderAll();
+}
+
+function updateGenreUI() {
+  const btnAll = document.getElementById('btnAll');
+  const btnMens = document.getElementById('btnMens');
+  const btnChusei = document.getElementById('btnChusei');
+  const isAll = selectedGenres.length === 0;
+
+  [btnAll, btnMens, btnChusei].forEach(btn => {
+    btn.classList.remove('active');
+    btn.style.color = '#94B7EF';
+    btn.style.background = '#1C228E';
+  });
+
+  if (isAll) {
+    btnAll.classList.add('active');
+    btnAll.style.color = '#1C228E';
+    btnAll.style.background = '#FFFFFF';
+  }
+  if (selectedGenres.includes('メンズカット')) {
+    btnMens.classList.add('active');
+    btnMens.style.color = '#1C228E';
+    btnMens.style.background = '#FFFFFF';
+  }
+  if (selectedGenres.includes('中性')) {
+    btnChusei.classList.add('active');
+    btnChusei.style.color = '#1C228E';
+    btnChusei.style.background = '#FFFFFF';
+  }
+}
+
+// ----- FILTER & RENDER -----
+function getFilteredStylists() {
+  return STYLISTS.filter(s => {
+    const genreMatch = selectedGenres.length === 0 || selectedGenres.some(g => s.genre.includes(g));
+    const areaMatch = selectedAreas.length === 0 || selectedAreas.includes(s.area);
+    return genreMatch && areaMatch;
+  });
+}
+
+function renderActiveConditions() {
+  const container = document.getElementById('activeConditions');
+  container.innerHTML = '';
+  const isAll = selectedGenres.length === 0 && selectedAreas.length === 0;
+
+  if (isAll) {
+    const tag = createConditionTag('All', null);
+    container.appendChild(tag);
+    return;
   }
 
-  // 日付生成
-  for (let day = 1; day <= daysInMonth; day++) {
-    const cell = document.createElement('div');
-    cell.className = 'cell';
-
-    const now = new Date();
-const isToday =
-  now.getFullYear() === year &&
-  now.getMonth() === month &&
-  now.getDate() === day;
-
-if (isToday) {
-  cell.classList.add('today');
+  selectedGenres.forEach(g => {
+    container.appendChild(createConditionTag(g, () => { setGenre(g); }));
+  });
+  selectedAreas.forEach(a => {
+    container.appendChild(createConditionTag(a, () => { toggleArea(a); updateAreaUI(); }));
+  });
 }
 
-    const mark = judge(day);
-    const work = schedule[day] || '';
-    const stamp = stamps[day] || '';
-
-    let stampIcon = '';
-    if (stamp === 'home') stampIcon = '💚';
-    if (stamp === 'aki') stampIcon = '🩵';
-    if (stamp === 'date') stampIcon = '💖';
-
-    cell.innerHTML = `
-      <div class="date">${day}</div>
-      <div class="mark ${mark === '○' ? 'circle' : 'cross'}">${mark}</div>
-      <div class="work">${work}</div>
-      <div style="font-size:18px;">${stampIcon}</div>
-    `;
-
-    
-    calendar.appendChild(cell);
+function createConditionTag(text, onRemove) {
+  const span = document.createElement('span');
+  span.className = 'animate-tag inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium';
+  span.style.cssText = 'background: #c4a87a22; color: #c4a87a; border: 1px solid #c4a87a44;';
+  span.textContent = text;
+  if (onRemove) {
+    const x = document.createElement('button');
+    x.innerHTML = '&times;';
+    x.className = 'ml-0.5 leading-none';
+    x.style.cssText = 'font-size: 14px; color: #c4a87a; opacity: 0.7;';
+    x.onclick = (e) => { e.stopPropagation(); onRemove(); };
+    span.appendChild(x);
   }
+  return span;
 }
 
-renderCalendar();
+function renderGrid() {
+  const grid = document.getElementById('stylistGrid');
+  const noResults = document.getElementById('noResults');
+  const resultCount = document.getElementById('resultCount');
+  const filtered = getFilteredStylists();
+
+  resultCount.textContent = `${filtered.length}人の美容師`;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    noResults.classList.remove('hidden');
+    return;
+  }
+  noResults.classList.add('hidden');
+
+  //一覧カード Build new content
+  const frag = document.createDocumentFragment();
+  filtered.forEach((s, i) => {
+    const card = document.createElement('div');
+    card.className = 'stylist-card rounded-xl overflow-hidden cursor-pointer animate-fade-up relative';
+    card.style.cssText = `background: #FFFFFF; animation-delay: ${i * 0.07}s;`;
+    card.onclick = () => openModal(s);
+
+    // Header
+    const header = document.createElement('div');
+header.className = 'w-full relative aspect-[3/1]';
+
+if (s.headerImage) {
+  const img = document.createElement('img');
+  img.src = s.headerImage;
+  img.className = 'w-full h-full object-cover';
+  img.alt = s.name + ' header';
+  header.appendChild(img);
+} else {
+  header.style.background = s.headerColor;
+}
+
+card.appendChild(header);
 
 
 
+   // Icon
+if (s.iconImage) {
+  const iconWrap = document.createElement('div');
+  iconWrap.className = 'absolute left-1/2 -translate-x-1/2';
+  iconWrap.style.cssText = 'top: 15px;';
+
+  const icon = document.createElement('div');
+  icon.className = 'rounded-full overflow-hidden';
+  icon.style.cssText = `
+    width: 60px;
+    height: 60px;
+    border: 3px solid #FFFFFF;
+  `;
+
+  const img = document.createElement('img');
+  img.src = s.iconImage;
+  img.className = 'w-full h-full object-cover';
+  img.alt = s.name + ' icon';
+
+  icon.appendChild(img);
+  iconWrap.appendChild(icon);
+  card.appendChild(iconWrap);
+}
+
+
+    // プロフィール
+    const info = document.createElement('div');
+    info.className = 'px-3 pb-3 pt-6';
+//名前
+    const name = document.createElement('p');
+    name.className = 'font-display font-600 text-center text-sm tracking-wide';
+    name.style.color = '#0F0646';
+    name.textContent = s.name;
+    info.appendChild(name);
+//ジャンル
+    const tags = document.createElement('div');
+    tags.className = 'flex flex-wrap gap-1 justify-center mt-1.5';
+    s.genre.forEach(g => {
+      const t = document.createElement('span');
+      t.className = 'text-xs px-2 py-0.5 rounded-full';
+      t.style.cssText = 'background: #7577A3; color: #FFFFFF; font-size: 8px;';
+      t.textContent = g;
+      tags.appendChild(t);
+    });
+    info.appendChild(tags);
+//エリア
+    const area = document.createElement('p');
+    area.className = 'text-center mt-1';
+    area.style.cssText = 'font-size: 10px; color: #9797A0;';
+    area.textContent = `📍 ${s.area}`;
+    info.appendChild(area);
+//bio
+    const bio = document.createElement('p');
+    bio.className = 'mt-2 leading-relaxed';
+    bio.style.cssText = 'font-size: 9px; color: #272729; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;';
+    bio.textContent = s.bio;
+    info.appendChild(bio);
+
+    card.appendChild(info);
+    frag.appendChild(card);
+  });
+
+  grid.innerHTML = '';
+  grid.appendChild(frag);
+}
+
+function renderAll() {
+  renderActiveConditions();
+  renderGrid();
+}
+
+// ----- MODAL -----
+function openModal(s) {
+  const overlay = document.getElementById('modalOverlay');
+  const content = document.getElementById('modalContent');
+
+content.innerHTML = `
+  <!-- Header -->
+  <div class="relative" style="
+    height: 120px;
+    background-image: url('${s.headerImage}');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  ">
+    <button onclick="closeModal()" 
+      class="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center"
+      style="background: rgba(0,0,0,0.4); color: #e0d5c1; font-size: 18px; backdrop-filter: blur(4px);">
+      &times;
+    </button>
+
+
+    <!-- Icon（ヘッダーの中に入れる） -->
+    <div style="
+      position: absolute;
+      left: 50%;
+      bottom: -32px;
+      transform: translateX(-50%);
+    ">
+      <img src="${s.iconImage}"
+        style="
+          width: 64px;
+          height: 64px;
+          object-fit: cover;
+          border-radius: 50%;
+          border: 4px solid #FFFFFF;
+        ">
+    </div>
+  </div>
+
+   <!-- modal内のInfo -->
+  <div class="px-5 pb-6 pt-12">
+    <h2 class="font-display font-700 text-center text-xl tracking-wider" style="color: #0F0646;">
+      ${s.name}
+    </h2>
+
+    <div class="flex flex-wrap gap-1.5 justify-center mt-2">
+      ${s.genre.map(g => `
+        <span class="text-xs px-3 py-1 rounded-full"
+          style="background: #7577A3; color: #FFFFFF;">
+          ${g}
+        </span>
+      `).join('')}
+    </div>
+
+    <p class="text-center mt-2 text-xs" style="color: #9797A0;">
+      📍 ${s.area}
+    </p>
+
+    <p class="mt-4 text-sm leading-relaxed" style="color: #272729;">
+      ${s.bio}
+    </p>
+
+      <!-- Image placeholder -->
+      <div class="mt-5 rounded-xl overflow-hidden" style="height: 180px; background: ${s.imageBg};">
+        <div class="w-full h-full flex items-center justify-center" style="color: #a89a8755;">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <path d="M21 15l-5-5L5 21"/>
+          </svg>
+        </div>
+      </div>
+
+
+      <!-- SNS Buttons -->
+      <div class="flex justify-center gap-4 mt-5">
+        <a href="${s.sns1}" target="_blank" rel="noopener noreferrer"
+class="sns-btn w-12 h-12 rounded-full flex items-center justify-center"
+style="
+  background: linear-gradient(135deg, #5C57B2, #2A2B53);
+  border: 1px solid #FFFFFF;
+  box-shadow: 0 5px 5px rgba(42, 43, 83, 0.4);
+"
+
+          <!-- TikTok placeholder -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>
+          </svg>
+        </a>
+
+
+        <a href="${s.sns2}" target="_blank" rel="noopener noreferrer" 
+class="sns-btn w-12 h-12 rounded-full flex items-center justify-center"
+style="
+  background: linear-gradient(135deg, #5C57B2, #2A2B53);
+  border: 1px solid #FFFFFF;
+  box-shadow: 0 5px 5px rgba(42, 43, 83, 0.4);
+"
+
+          <!-- Instagram placeholder -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <circle cx="12" cy="12" r="5"/>
+            <circle cx="17.5" cy="6.5" r="1.5" fill="#e0d5c1" stroke="none"/>
+          </svg>
+
+        </a>
+      </div>
+    </div>
+  `;
+
+  overlay.classList.remove('hidden');
+  content.classList.add('animate-modal');
+  overlay.classList.add('animate-backdrop');
+}
+
+function closeModal(event) {
+  if (event && event.target !== document.getElementById('modalOverlay')) return;
+  const overlay = document.getElementById('modalOverlay');
+  overlay.classList.add('hidden');
+  overlay.classList.remove('animate-backdrop');
+  document.getElementById('modalContent').classList.remove('animate-modal');
+}
+// Also close on direct call without event (the X button)
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) {
+    this.classList.add('hidden');
+    this.classList.remove('animate-backdrop');
+    document.getElementById('modalContent').classList.remove('animate-modal');
+  }
+});
+
+// ----- ELEMENT SDK -----
+const defaultConfig = {
+  site_title: "GENDERLESS HAIR BOOK",
+  site_subtitle: "ジェンダーレスヘア美容師図鑑",
+  background_color: "#1a1714",
+  surface_color: "#252119",
+  text_color: "#e0d5c1",
+  accent_color: "#c4a87a",
+  muted_color: "#a89a87",
+  font_family: "Zen Kaku Gothic New",
+  font_size: 14
+};
+
+function applyConfig(config) {
+  const title = document.getElementById('siteTitle');
+  const subtitle = document.getElementById('siteSubtitle');
+  if (title) title.textContent = config.site_title || defaultConfig.site_title;
+  if (subtitle) subtitle.textContent = config.site_subtitle || defaultConfig.site_subtitle;
+
+  const app = document.getElementById('app');
+  if (app) {
+    app.style.background = config.background_color || defaultConfig.background_color;
+    app.style.color = config.text_color || defaultConfig.text_color;
+    const ff = config.font_family || defaultConfig.font_family;
+    app.style.fontFamily = `${ff}, sans-serif`;
+  }
+
+  const baseSize = config.font_size || defaultConfig.font_size;
+  if (title) title.style.fontSize = `${baseSize * 2}px`;
+  if (subtitle) subtitle.style.fontSize = `${baseSize * 0.93}px`;
+}
+
+if (window.elementSdk) {
+  window.elementSdk.init({
+    defaultConfig,
+    onConfigChange: async (config) => {
+      applyConfig(config);
+    },
+    mapToCapabilities: (config) => ({
+      recolorables: [
+        { get: () => config.background_color || defaultConfig.background_color, set: (v) => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); } },
+        { get: () => config.surface_color || defaultConfig.surface_color, set: (v) => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); } },
+        { get: () => config.text_color || defaultConfig.text_color, set: (v) => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+        { get: () => config.accent_color || defaultConfig.accent_color, set: (v) => { config.accent_color = v; window.elementSdk.setConfig({ accent_color: v }); } },
+        { get: () => config.muted_color || defaultConfig.muted_color, set: (v) => { config.muted_color = v; window.elementSdk.setConfig({ muted_color: v }); } }
+      ],
+      borderables: [],
+      fontEditable: {
+        get: () => config.font_family || defaultConfig.font_family,
+        set: (v) => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); }
+      },
+      fontSizeable: {
+        get: () => config.font_size || defaultConfig.font_size,
+        set: (v) => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); }
+      }
+    }),
+    mapToEditPanelValues: (config) => new Map([
+      ["site_title", config.site_title || defaultConfig.site_title],
+      ["site_subtitle", config.site_subtitle || defaultConfig.site_subtitle]
+    ])
+  });
+}
+
+// ----- BOOT -----
+initAreaGrid();
+renderAll();
 </script>
-
-</body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ce358afe0c6ded5',t:'MTc3MTE0MzIxMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
