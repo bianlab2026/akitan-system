@@ -11,22 +11,31 @@
     padding: 20px;
   }
 
+  #calendar {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
   h1 {
     text-align: center;
     margin-bottom: 20px;
     letter-spacing: 1px;
   }
 
-  .week-header .cell {
-     position: sticky;
+ .week-header {
+  position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 20;
   background: #44CAD1;
   padding-bottom: 8px;
+}
+
+.week-header .cell {
   background: transparent;
   font-weight: bold;
   min-height: auto;
 }
+
 
   
   .calendar {
