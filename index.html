@@ -108,7 +108,14 @@ const schedule = {
 };
 
 const daysInMonth = 28;
-const startDay = 0; // 月曜始まり（0=月）
+
+  const year = 2026;
+const month = 1; // 0=1月, 1=2月
+
+const firstDay = new Date(year, month, 1).getDay(); 
+const startDay = (firstDay + 6) % 7; // 月曜始まり変換
+
+  
 
 const calendar = document.getElementById('calendar');
 
