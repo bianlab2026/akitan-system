@@ -107,6 +107,8 @@ const schedule = {
   21: '日勤',
 };
 
+  
+
 const stamps = {};
 
 const year = 2026;
@@ -169,6 +171,8 @@ function renderCalendar() {
       else if (current === 'home') stamps[day] = 'aki';
       else if (current === 'aki') stamps[day] = 'date';
       else delete stamps[day];
+      
+localStorage.setItem('stamps', JSON.stringify(stamps));
 
       renderCalendar();
     });
