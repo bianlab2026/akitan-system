@@ -109,7 +109,8 @@ const schedule = {
 
   
 
-const stamps = {};
+const stamps = JSON.parse(localStorage.getItem('stamps')) || {};
+
 
 const year = 2026;
 const month = 1;
