@@ -136,7 +136,49 @@ function renderCalendar() {
 
   // 月初空白
   for (let i = 0; i < startDay; i++) {
-    const empty = document.c
+       const empty = document.createElement('div');
+    empty.className = 'cell empty';
+    calendar.appendChild(empty);
+  }
+
+  // 日付生成
+  for (let day = 1; day <= daysInMonth; day++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+
+    const mark = judge(day);
+    const work = schedule[day] || '';
+    const stamp = stamps[day] || '';
+
+    let stampIcon = '';
+    if (stamp === 'home') stampIcon = '💚';
+    if (stamp === 'aki') stampIcon = '🩵';
+    if (stamp === 'date') stampIcon = '💖';
+
+    cell.innerHTML = `
+      <div class="date">${day}</div>
+      <div class="mark ${mark === '○' ? 'circle' : 'cross'}">${mark}</div>
+      <div class="work">${work}</div>
+      <div style="font-size:18px;">${stampIcon}</div>
+    `;
+
+    cell.addEventListener('click', () => {
+      const current = stamps[day];
+
+      if (!current) stamps[day] = 'home';
+      else if (current === 'home') stamps[day] = 'aki';
+      else if (current === 'aki') stamps[day] = 'date';
+      else delete stamps[day];
+
+      renderCalendar();
+    });
+
+    calendar.appendChild(cell);
+  }
+}
+
+renderCalendar();
+
 
 
 </script>
