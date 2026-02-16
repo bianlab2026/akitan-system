@@ -109,7 +109,15 @@ const schedule = {
 
   
 
-const stamps = JSON.parse(localStorage.getItem('stamps')) || {};
+const stamps = JSON.parse(localStorage.getItem('stamps'))<script>
+// ここを変更！
+const stamps = {
+  1: 'home',   // 1日 → こうみ家
+  5: 'aki',    // 5日 → あき家
+  14: 'date'   // 14日 → デート
+};
+</script>
+ || {};
 
 
 const year = 2026;
