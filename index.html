@@ -63,6 +63,8 @@
   }
 </style>
 </head>
+
+  
 <body>
 
 <h1>🐶2026 February💉</h1>
@@ -121,11 +123,11 @@ function judge(day) {
 
   if (!today) return '';
 
-  if(next === '休み') ||
-    (next === '研修')
-  ) {
+   if (next === '休み' || next === '研修') {
     return '○';
   }
+
+
 
   if (next === '日勤' || next === '夜勤入り') {
     return '×';
