@@ -167,19 +167,7 @@ function renderCalendar() {
       <div style="font-size:18px;">${stampIcon}</div>
     `;
 
-    cell.addEventListener('click', () => {
-      const current = stamps[day];
-
-      if (!current) stamps[day] = 'home';
-      else if (current === 'home') stamps[day] = 'aki';
-      else if (current === 'aki') stamps[day] = 'date';
-      else delete stamps[day];
-      
-localStorage.setItem('stamps', JSON.stringify(stamps));
-
-      renderCalendar();
-    });
-
+    
     calendar.appendChild(cell);
   }
 }
