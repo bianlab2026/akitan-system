@@ -5,88 +5,120 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>2026 Calendar Feb-Aug</title>
 <style>
-  body {
-    margin:0;
-    font-family: system-ui, sans-serif;
-    background: #44CAD1;
-  }
+body {
+  margin:0;
+  font-family: system-ui, sans-serif;
+  background: #44CAD1;
+}
 
-  h1 {
-    text-align: center;
-    margin: 8px 0 4px;
-    color: #fff;
-    font-size: 22px;
-    letter-spacing: 1px;
-  }
+/* タイトル */
+h1 {
+  text-align: center;
+  margin: 8px 0 4px;
+  color: #fff;
+  font-size: 22px;
+  letter-spacing: 1px;
+}
 
-  .month-label-container {
-    position: sticky;
-    top: 50px;
-    background: #44CAD1;
-    z-index: 20;
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
-    color: #fff;
-    padding: 4px 0;
-  }
+/* 固定曜日バー */
+.weekday-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #44CAD1;
+}
 
-  .month-container {
-    margin-bottom: 16px;
-  }
+.weekday {
+  background: #000;
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px; /* 小さめ */
+  text-align: center;
+  padding: 4px 0; /* 高さ控えめ */
+  border-radius: 4px;
+}
 
-  .calendar {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 2px;
-    width: 100%;
-  }
+/* 月ラベル */
+.month-label-container {
+  position: sticky;
+  top: 26px; /* 曜日バー下 */
+  background: #44CAD1;
+  z-index: 15;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+  padding: 2px 0;
+}
 
-  .cell {
-    background: #fff;
-    border-radius: 8px;
-    text-align: center;
-    position: relative;
-    aspect-ratio: 1 / 1.6;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    font-size: 16px;
-    padding: 6px 4px;
-  }
+/* カレンダー本体 */
+.month-container {
+  margin-bottom: 16px;
+}
 
-  .weekday {
-    position: sticky;
-    top: 0;
-    background: #000;
-    color: #fff;
-    font-weight: bold;
-    z-index: 10;
-    border-bottom: 1px solid #333;
-    font-size: 18px;
-  }
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  width: 100%;
+}
 
-  .cell.sat { background: #d3d3d3; }
-  .cell.sun { background: #d3d3d3; }
-  .cell.holiday { background: #fff2cc; }
+.cell {
+  background: #fff;
+  border-radius: 8px;
+  text-align: center;
+  position: relative;
+  aspect-ratio: 1 / 1.6; /* 縦長 */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 16px;
+  padding: 6px 4px;
+}
 
-  .today {
-    border: 3px solid #ff0000;
-    box-shadow: 0 0 16px rgba(255,0,0,0.9);
-    transform: scale(1.07);
-    z-index: 5;
-  }
+.cell.sat { background: #d3d3d3; }
+.cell.sun { background: #d3d3d3; }
+.cell.holiday { background: #fff2cc; }
 
-  .date { font-weight: bold; margin-bottom: 4px; font-size: 18px; }
-  .mark { font-size: 18px; margin-bottom: 2px; }
-  .work { font-size: 14px; opacity: 0.85; }
-  .stamp { font-size: 24px; position: absolute; bottom: 4px; right: 4px; }
+/* today 赤光り */
+.today {
+  border: 3px solid #ff0000;
+  box-shadow: 0 0 16px rgba(255,0,0,0.9);
+  transform: scale(1.07);
+  z-index: 5;
+}
+
+/* 日付・マーク・勤務 */
+.date { font-weight: bold; margin-bottom: 4px; font-size: 18px; }
+.mark { font-size: 18px; margin-bottom: 2px; }
+.work { font-size: 14px; opacity: 0.85; }
+
+/* スタンプ */
+.stamp { font-size: 24px; position: absolute; bottom: 4px; right: 4px; }
 </style>
 </head>
 <body>
 
 <h1>🐶2026 Calendar 💉</h1>
+
+<!-- 曜日バー固定 -->
+<div class="weekday-row">
+  <div class="weekday">Mon</div>
+  <div class="weekday">Tue</div>
+  <div class="weekday">Wed</div>
+  <div class="weekday">Thu</div>
+  <div class="weekday">Fri</div>
+  <div class="weekday sat">Sat</div>
+  <div class="weekday sun">Sun</div>
+</div>
+
+<!-- 月ラベル -->
 <div class="month-label-container" id="month-label">2月</div>
+
+<!-- カレンダー本体 -->
 <div id="calendar"></div>
 
 <script>
@@ -94,9 +126,12 @@ const year = 2026;
 const calendarDiv = document.getElementById('calendar');
 const monthLabelDiv = document.getElementById('month-label');
 
+/* 月データ */
 const monthData = {
-  2: { days:28, schedule:{1:'日勤',2:'日勤',3:'研修',4:'夜勤入り',5:'休み',6:'休み',7:'日勤',8:'日勤',9:'休み',10:'休み',11:'日勤',12:'夜勤入り',13:'夜勤入り',14:'日勤',15:'日勤',16:'日勤',17:'日勤',18:'日勤',19:'休み',20:'休み',21:'日勤'} },
-  3: { days:31, schedule:{} },
+  2: { days:28, schedule:{1:'日勤',2:'日勤',3:'研修',4:'夜勤入り',5:'休み',6:'休み',7:'日勤',8:'日勤',9:'休み',10:'休み',11:'日勤',12:'夜勤入り',13:'夜勤明け',14:'日勤',15:'日勤',16:'日勤',17:'日勤',18:'日勤',19:'休み',20:'休み',21:'日勤',22:'日勤',23:'夜勤入り',24:'夜勤明け',25:'休み',26:'日勤',27:'休み',28:'日勤'} },
+	
+	
+  3: { days:31, schedule:{1:'日勤',2:'研修',3:'夜勤入り',4:'夜勤明け',5:'休み',6:'日勤',7:'日勤',8:'夜勤入り',9:'夜勤明け',10:'休み',11:'休み',12:'日勤',13:'日勤',14:'休み',15:'休み',16:'日勤',17:'日勤',18:'日勤',19:'休み',20:'休み',21:'休み'} },
   4: { days:30, schedule:{} },
   5: { days:31, schedule:{} },
   6: { days:30, schedule:{} },
@@ -104,13 +139,16 @@ const monthData = {
   8: { days:31, schedule:{} }
 };
 
+/* スタンプデータ */
 const stamps = {
-  2:{1:'💚',2:'💚',5:'💙',6:'💙',14:'💖'},
-  3:{},4:{},5:{},6:{},7:{},8:{}
+  2:{1:'💚',2:'💚',5:'💙',6:'💙',8:'💚',9:'💚',10:'💚',14:'💖',18:'💚',19:'💚',20:'💚'},
+  3:{14:'💖'},
 };
 
-const holidays = {2:[11],3:[],4:[],5:[],6:[],7:[],8:[]};
+/* 祝日データ（例） */
+const holidays = {2:[11,23],3:[20],4:[29],5:[],6:[],7:[20],8:[11]};
 
+/* 勤務マーク判定 */
 function judge(day, schedule){
   const today = schedule[day];
   const next = schedule[day+1];
@@ -131,16 +169,8 @@ for(const monthNum in monthData){
   const calendarGrid = document.createElement('div');
   calendarGrid.className='calendar';
 
-  // 曜日行もセルとして追加
-  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d=>{
-    const wd = document.createElement('div');
-    wd.className='cell weekday';
-    wd.textContent=d;
-    calendarGrid.appendChild(wd);
-  });
-
   const firstDay = new Date(year, monthNum-1,1).getDay();
-  const startDay = (firstDay+6)%7;
+  const startDay = (firstDay+6)%7; // 月曜始まり
 
   for(let i=0;i<startDay;i++){
     const emptyCell = document.createElement('div');
@@ -183,7 +213,7 @@ for(const monthNum in monthData){
   calendarDiv.appendChild(monthContainer);
 }
 
-// IntersectionObserverで月ラベル切替
+// 月ラベル切替
 const observer = new IntersectionObserver((entries)=>{
   entries.forEach(entry=>{
     if(entry.isIntersecting){
@@ -197,7 +227,7 @@ monthCells.forEach(item=>{
   observer.observe(item.cell);
 });
 
-// ページ読み込み時にtodayが中央に来るようスクロール
+// today が中央に来るようスクロール
 window.onload = function(){
   if(firstTodayCell){
     const y = firstTodayCell.getBoundingClientRect().top + window.scrollY - window.innerHeight/2 + firstTodayCell.offsetHeight/2;
