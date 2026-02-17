@@ -20,10 +20,9 @@
     color: #fff;
   }
 
-  /* 月ラベル固定 */
   .month-label-container {
     position: sticky;
-    top: 50px; /* タイトル下に固定 */
+    top: 50px; 
     background: #44CAD1;
     z-index: 20;
     text-align: center;
@@ -33,12 +32,15 @@
     padding: 4px 0;
   }
 
-  /* 曜日固定 */
+  .month-container {
+    margin-bottom: 16px;
+  }
+
   .weekday-row {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     position: sticky;
-    top: 80px; /* 月ラベル下 */
+    top: 80px;
     background: #000;
     z-index: 10;
   }
@@ -46,7 +48,7 @@
   .weekday {
     text-align: center;
     font-weight: bold;
-    padding: 12px 0;
+    padding: 10px 0;
     color: #fff;
     font-size: 18px;
     border-bottom: 1px solid #333;
@@ -64,7 +66,7 @@
     border-radius: 8px;
     text-align: center;
     position: relative;
-    aspect-ratio: 1 / 1.6; /* 縦長 */
+    aspect-ratio: 1 / 1.6; 
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -72,14 +74,10 @@
     padding: 6px 4px;
   }
 
-  /* 土日色 */
   .cell.sat { background: #d3d3d3; }
   .cell.sun { background: #d3d3d3; }
-
-  /* 祝日 */
   .cell.holiday { background: #fff2cc; }
 
-  /* today */
   .today {
     border: 3px solid #ff0000;
     box-shadow: 0 0 16px rgba(255,0,0,0.9);
@@ -98,24 +96,13 @@
 <h1>🐶2026 Calendar 💉</h1>
 <div class="month-label-container" id="month-label">2月</div>
 
-<div class="weekday-row">
-  <div class="weekday">Mon</div>
-  <div class="weekday">Tue</div>
-  <div class="weekday">Wed</div>
-  <div class="weekday">Thu</div>
-  <div class="weekday">Fri</div>
-  <div class="weekday">Sat</div>
-  <div class="weekday">Sun</div>
-</div>
-
-<div id="calendar" class="calendar"></div>
+<div id="calendar"></div>
 
 <script>
 const year = 2026;
 const calendarDiv = document.getElementById('calendar');
 const monthLabelDiv = document.getElementById('month-label');
 
-// 月ごとの日数・スケジュール
 const monthData = {
   2: { days:28, schedule:{1:'日勤',2:'日勤',3:'研修',4:'夜勤入り',5:'休み',6:'休み',7:'日勤',8:'日勤',9:'休み',10:'休み',11:'日勤',12:'夜勤入り',13:'夜勤入り',14:'日勤',15:'日勤',16:'日勤',17:'日勤',18:'日勤',19:'休み',20:'休み',21:'日勤'} },
   3: { days:31, schedule:{} },
@@ -126,13 +113,11 @@ const monthData = {
   8: { days:31, schedule:{} }
 };
 
-// スタンプ 💚💙💖
 const stamps = {
   2:{1:'💚',2:'💚',5:'💙',6:'💙',14:'💖'},
   3:{},4:{},5:{},6:{},7:{},8:{}
 };
 
-// 簡易祝日
 const holidays = {2:[11],3:[],4:[],5:[],6:[],7:[],8:[]};
 
 function judge(day, schedule){
@@ -145,14 +130,38 @@ function judge(day, schedule){
 }
 
 let firstTodayCell = null;
-const monthCells = []; // 月ごとの最初のセル記録
+const monthCells = [];
 
 for(const monthNum in monthData){
   const month = monthData[monthNum];
+  const monthContainer = document.createElement('div');
+  monthContainer.className='month-container';
+
+  // 曜日行
+  const weekdayRow = document.createElement('div');
+  weekdayRow.className='weekday-row';
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d=>{
+    const wd = document.createElement('div');
+    wd.className='weekday';
+    wd.textContent = d;
+    weekdayRow.appendChild(wd);
+  });
+  monthContainer.appendChild(weekdayRow);
+
+  const calendarGrid = document.createElement('div');
+  calendarGrid.className='calendar';
+
   const firstDay = new Date(year, monthNum-1,1).getDay();
   const startDay = (firstDay+6)%7; // 月曜始まり
 
-  for(let day=1; day<=month.days; day++){
+  // 月初の空白
+  for(let i=0;i<startDay;i++){
+    const emptyCell = document.createElement('div');
+    emptyCell.className='cell';
+    calendarGrid.appendChild(emptyCell);
+  }
+
+  for(let day=1;day<=month.days;day++){
     const cell = document.createElement('div');
     cell.className='cell';
 
@@ -178,22 +187,23 @@ for(const monthNum in monthData){
       ${stamps[monthNum] && stamps[monthNum][day]?`<div class="stamp">${stamps[monthNum][day]}</div>`:''}
     `;
 
-    calendarDiv.appendChild(cell);
+    calendarGrid.appendChild(cell);
 
-    // 月最初のセル記録
     if(day===1) monthCells.push({month: monthNum, cell});
   }
+
+  monthContainer.appendChild(calendarGrid);
+  calendarDiv.appendChild(monthContainer);
 }
 
 // IntersectionObserverで月ラベル切替
-const observerOptions = {root:null, rootMargin:'0px', threshold:0.1};
 const observer = new IntersectionObserver((entries)=>{
   entries.forEach(entry=>{
     if(entry.isIntersecting){
       monthLabelDiv.textContent = `${entry.target.dataset.month}月`;
     }
   });
-}, observerOptions);
+},{root:null, rootMargin:'0px', threshold:0.2});
 
 monthCells.forEach(item=>{
   item.cell.dataset.month = item.month;
