@@ -16,6 +16,21 @@
     margin-bottom: 20px;
     letter-spacing: 1px;
   }
+	
+	.weekday {
+  background: #000;
+  color: #fff;
+  font-weight: bold;
+  padding: 8px 0;
+  border-radius: 10px;
+}
+
+.today {
+  border: 3px solid #ff9800;
+  box-shadow: 0 0 12px rgba(255, 152, 0, 0.7);
+  transform: scale(1.05);
+}
+
 
   .calendar {
     display: grid;
@@ -91,10 +106,31 @@ const daysInMonth = 28;
 const startDay = 0; // 月曜始まり（0=月）
 
 const calendar = document.getElementById('calendar');
+	
+	// 曜日表示
+const weekdays = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+weekdays.forEach(day => {
+  const wd = document.createElement('div');
+  wd.className = 'weekday';
+  wd.textContent = day;
+  calendar.appendChild(wd);
+});
+
 
 // 月初までの空白
 for (let i = 0; i < startDay; i++) {
   calendar.appendChild(document.createElement('div')).className = 'cell empty';
+	const now = new Date();
+const isToday =
+  now.getFullYear() === 2026 &&
+  now.getMonth() === 1 && // 2月は1
+  now.getDate() === day;
+
+if (isToday) {
+  cell.classList.add('today');
+}
+
 }
 
 function judge(day) {
