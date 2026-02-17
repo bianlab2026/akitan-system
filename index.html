@@ -8,163 +8,149 @@
     font-family: system-ui, sans-serif;
     background: #44CAD1;
     color: #000;
-    padding: 20px;
+    padding: 10px;
+    margin: 0;
   }
 
   h1 {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     letter-spacing: 1px;
+    font-size: clamp(18px, 4vw, 28px); /* 画面幅に応じて拡縮 */
   }
-	
-	.weekday {
-  background: #000;
-  color: #fff;
-  font-weight: bold;
-  padding: 8px 0;
-  border-radius: 10px;
-}
-
-.today {
-  border: 3px solid #ff9800;
-  box-shadow: 0 0 12px rgba(255, 152, 0, 0.7);
-  transform: scale(1.05);
-}
-
 
   .calendar {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
+    gap: 6px;
+    width: 100%;
     max-width: 700px;
     margin: 0 auto;
   }
 
+  .weekday {
+    text-align: center;
+    font-weight: bold;
+    padding: 6px 0;
+    border-radius: 8px;
+    color: #fff;
+    background: #000;
+    font-size: clamp(12px, 2.5vw, 16px);
+  }
+
   .cell {
     background: #fff;
-    border-radius: 12px;
-    padding: 10px 6px;
+    border-radius: 10px;
+    padding: 8px 4px;
     text-align: center;
-    min-height: 90px;
+    min-height: 70px;
+    position: relative;
+    font-size: clamp(10px, 2vw, 14px);
   }
 
-  .date {
-    font-weight: bold;
-    margin-bottom: 6px;
+  .cell.sat { background: #e0e0ff; }
+  .cell.sun { background: #ffe0e0; }
+  .cell.holiday { background: #fff2cc; }
+
+  .today {
+    border: 3px solid #ff9800;
+    box-shadow: 0 0 10px rgba(255,152,0,0.7);
+    transform: scale(1.03);
   }
 
-  .mark {
-    font-size: 20px;
-    margin-bottom: 6px;
-  }
-
+  .date { font-weight: bold; margin-bottom: 4px; }
+  .mark { font-size: 18px; margin-bottom: 4px; }
   .circle { color: #4caf50; }
   .cross { color: #f44336; }
+  .work { font-size: 12px; opacity: 0.85; }
+  .stamp { font-size: 16px; position: absolute; bottom: 3px; right: 3px; }
 
-  .work {
-    font-size: 13px;
-    opacity: 0.85;
-  }
+  .empty { background: transparent; }
 
-  .empty {
-    background: transparent;
+  /* スマホ用微調整 */
+  @media (max-width: 500px) {
+    .cell { min-height: 60px; padding: 6px 2px; }
+    .stamp { font-size: 14px; }
   }
 </style>
 </head>
 <body>
 
 <h1>🐶2026 February💉</h1>
-
 <div class="calendar" id="calendar"></div>
 
 <script>
 const schedule = {
-  1: '日勤',
-  2: '日勤',
-  3: '研修',
-  4: '夜勤入り',
-  5: '休み',
-  6: '休み',
-  7: '日勤',
-  8: '日勤',
-  9: '休み',
-  10: '休み',
-  11: '日勤',
-  12: '夜勤入り',
-  13: '夜勤入り',
-  14: '日勤',
-  15: '日勤',
-  16: '日勤',
-  17: '日勤',
-  18: '日勤',
-  19: '休み',
-  20: '休み',
-  21: '日勤',
+  1:'日勤',2:'日勤',3:'研修',4:'夜勤入り',5:'休み',6:'休み',
+  7:'日勤',8:'日勤',9:'休み',10:'休み',11:'日勤',12:'夜勤入り',
+  13:'夜勤入り',14:'日勤',15:'日勤',16:'日勤',17:'日勤',18:'日勤',
+  19:'休み',20:'休み',21:'日勤'
 };
 
+const stamps = {
+  1:'🏠こうみ家',2:'🏠こうみ家',5:'🏠あき家',6:'🏠あき家',14:'💖デート'
+};
+
+const year = 2026;
+const month = 1; // 0=1月, 1=2月
 const daysInMonth = 28;
-const startDay = 0; // 月曜始まり（0=月）
+
+// 月曜始まり
+const firstDay = new Date(year, month, 1).getDay();
+const startDay = (firstDay + 6) % 7;
 
 const calendar = document.getElementById('calendar');
-	
-	// 曜日表示
-const weekdays = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
-weekdays.forEach(day => {
+// 曜日表示
+const weekdays = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+weekdays.forEach(day=>{
   const wd = document.createElement('div');
   wd.className = 'weekday';
   wd.textContent = day;
   calendar.appendChild(wd);
 });
 
-
-// 月初までの空白
-for (let i = 0; i < startDay; i++) {
-  calendar.appendChild(document.createElement('div')).className = 'cell empty';
-	const now = new Date();
-const isToday =
-  now.getFullYear() === 2026 &&
-  now.getMonth() === 1 && // 2月は1
-  now.getDate() === day;
-
-if (isToday) {
-  cell.classList.add('today');
+// 月初空白
+for(let i=0;i<startDay;i++){
+  const emptyCell = document.createElement('div');
+  emptyCell.className = 'cell empty';
+  calendar.appendChild(emptyCell);
 }
 
-}
-
-function judge(day) {
+function judge(day){
   const today = schedule[day];
-  const next = schedule[day + 1];
-
-  if (!today) return '';
-
-  if (
-    (today === '夜勤入り' && next) ||
-    (next === '休み') ||
-    (next === '研修')
-  ) {
-    return '○';
-  }
-
-  if (next === '日勤' || next === '夜勤入り') {
-    return '×';
-  }
-
+  const next = schedule[day+1];
+  if(!today) return '';
+  if((today==='夜勤入り'&&next)||(next==='休み')||(next==='研修')) return '○';
+  if(next==='日勤'||next==='夜勤入り') return '×';
   return '';
 }
 
-for (let day = 1; day <= daysInMonth; day++) {
+// 簡易祝日（建国記念日 2/11）
+const holidays = [11];
+
+for(let day=1;day<=daysInMonth;day++){
   const cell = document.createElement('div');
   cell.className = 'cell';
+
+  const weekdayIndex = (startDay + day -1) % 7;
+  if(weekdayIndex===5) cell.classList.add('sat');
+  if(weekdayIndex===6) cell.classList.add('sun');
+  if(holidays.includes(day)) cell.classList.add('holiday');
 
   const mark = judge(day);
   const work = schedule[day] || '';
 
+  // today判定
+  const now = new Date();
+  const isToday = now.getFullYear()===year && now.getMonth()===month && now.getDate()===day;
+  if(isToday) cell.classList.add('today');
+
   cell.innerHTML = `
     <div class="date">${day}</div>
-    <div class="mark ${mark === '○' ? 'circle' : 'cross'}">${mark}</div>
+    <div class="mark ${mark==='○'?'circle':'cross'}">${mark}</div>
     <div class="work">${work}</div>
+    ${stamps[day]?`<div class="stamp">${stamps[day]}</div>`:''}
   `;
 
   calendar.appendChild(cell);
