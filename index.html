@@ -7,22 +7,21 @@
 <style>
   body {
     margin:0;
-    padding:0;
     font-family: system-ui, sans-serif;
     background: #44CAD1;
   }
 
   h1 {
     text-align: center;
-    margin: 12px 0 4px 0;
+    margin: 8px 0 4px;
+    color: #fff;
     font-size: 22px;
     letter-spacing: 1px;
-    color: #fff;
   }
 
   .month-label-container {
     position: sticky;
-    top: 50px; 
+    top: 50px;
     background: #44CAD1;
     z-index: 20;
     text-align: center;
@@ -34,24 +33,6 @@
 
   .month-container {
     margin-bottom: 16px;
-  }
-
-  .weekday-row {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    position: sticky;
-    top: 80px;
-    background: #000;
-    z-index: 10;
-  }
-
-  .weekday {
-    text-align: center;
-    font-weight: bold;
-    padding: 10px 0;
-    color: #fff;
-    font-size: 18px;
-    border-bottom: 1px solid #333;
   }
 
   .calendar {
@@ -66,12 +47,23 @@
     border-radius: 8px;
     text-align: center;
     position: relative;
-    aspect-ratio: 1 / 1.6; 
+    aspect-ratio: 1 / 1.6;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     font-size: 16px;
     padding: 6px 4px;
+  }
+
+  .weekday {
+    position: sticky;
+    top: 0;
+    background: #000;
+    color: #fff;
+    font-weight: bold;
+    z-index: 10;
+    border-bottom: 1px solid #333;
+    font-size: 18px;
   }
 
   .cell.sat { background: #d3d3d3; }
@@ -95,7 +87,6 @@
 
 <h1>🐶2026 Calendar 💉</h1>
 <div class="month-label-container" id="month-label">2月</div>
-
 <div id="calendar"></div>
 
 <script>
@@ -137,24 +128,20 @@ for(const monthNum in monthData){
   const monthContainer = document.createElement('div');
   monthContainer.className='month-container';
 
-  // 曜日行
-  const weekdayRow = document.createElement('div');
-  weekdayRow.className='weekday-row';
-  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d=>{
-    const wd = document.createElement('div');
-    wd.className='weekday';
-    wd.textContent = d;
-    weekdayRow.appendChild(wd);
-  });
-  monthContainer.appendChild(weekdayRow);
-
   const calendarGrid = document.createElement('div');
   calendarGrid.className='calendar';
 
-  const firstDay = new Date(year, monthNum-1,1).getDay();
-  const startDay = (firstDay+6)%7; // 月曜始まり
+  // 曜日行もセルとして追加
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d=>{
+    const wd = document.createElement('div');
+    wd.className='cell weekday';
+    wd.textContent=d;
+    calendarGrid.appendChild(wd);
+  });
 
-  // 月初の空白
+  const firstDay = new Date(year, monthNum-1,1).getDay();
+  const startDay = (firstDay+6)%7;
+
   for(let i=0;i<startDay;i++){
     const emptyCell = document.createElement('div');
     emptyCell.className='cell';
@@ -218,6 +205,5 @@ window.onload = function(){
   }
 };
 </script>
-
 </body>
 </html>
