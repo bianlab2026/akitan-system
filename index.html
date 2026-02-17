@@ -3,31 +3,53 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Schedule Checker 2026 Feb-Aug</title>
+<title>2026 Calendar Feb-Aug</title>
 <style>
   body {
+    margin:0;
+    padding:0;
     font-family: system-ui, sans-serif;
-    margin: 0;
-    padding: 0;
     background: #44CAD1;
   }
 
   h1 {
     text-align: center;
-    margin: 12px 0;
+    margin: 12px 0 4px 0;
     font-size: 22px;
     letter-spacing: 1px;
+    color: #fff;
   }
 
-  .month {
-    width: 100%;
-    padding: 10px;
-  }
-
-  .month h2 {
+  /* 月ラベル固定 */
+  .month-label-container {
+    position: sticky;
+    top: 50px; /* タイトル下に固定 */
+    background: #44CAD1;
+    z-index: 20;
     text-align: center;
-    margin-bottom: 6px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    padding: 4px 0;
+  }
+
+  /* 曜日固定 */
+  .weekday-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    position: sticky;
+    top: 80px; /* 月ラベル下 */
+    background: #000;
+    z-index: 10;
+  }
+
+  .weekday {
+    text-align: center;
+    font-weight: bold;
+    padding: 12px 0;
+    color: #fff;
     font-size: 18px;
+    border-bottom: 1px solid #333;
   }
 
   .calendar {
@@ -37,61 +59,63 @@
     width: 100%;
   }
 
-  .weekday {
-  text-align: center;
-  font-weight: bold;
-  padding: 10px 0;  /* 余白増やす */
-  border-radius: 6px;
-  color: #fff;
-  background: #000;
-  font-size: 18px;  /* ここを大きく */
-}
-
-
   .cell {
     background: #fff;
     border-radius: 8px;
     text-align: center;
     position: relative;
-    aspect-ratio: 1 / 1.3; /* 縦長に */
-    font-size: 18px;
-	  aspect-ratio: 1 / 1.4; /* 縦長にして曜日とのバランスを調整 */
+    aspect-ratio: 1 / 1.6; /* 縦長 */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    font-size: 16px;
     padding: 6px 4px;
   }
 
-  /* 土日・祝日色分け */
-  .cell.sat { background: #e0e0ff; }
-  .cell.sun { background: #ffe0e0; }
+  /* 土日色 */
+  .cell.sat { background: #d3d3d3; }
+  .cell.sun { background: #d3d3d3; }
+
+  /* 祝日 */
   .cell.holiday { background: #fff2cc; }
 
+  /* today */
   .today {
-    border: 2px solid #ff9800;
-    box-shadow: 0 0 8px rgba(255,152,0,0.7);
-    transform: scale(1.03);
+    border: 3px solid #ff0000;
+    box-shadow: 0 0 16px rgba(255,0,0,0.9);
+    transform: scale(1.07);
+    z-index: 5;
   }
 
-  .date { font-weight: bold; margin-bottom: 4px; }
-  .mark { font-size: 16px; margin-bottom: 2px; }
-  .circle { color: #4caf50; }
-  .cross { color: #f44336; }
-  .work { font-size: 12px; opacity: 0.85; }
-  .stamp { font-size: 16px; position: absolute; bottom: 2px; right: 2px; }
-  .empty { background: transparent; }
+  .date { font-weight: bold; margin-bottom: 4px; font-size: 18px; }
+  .mark { font-size: 18px; margin-bottom: 2px; }
+  .work { font-size: 14px; opacity: 0.85; }
+  .stamp { font-size: 24px; position: absolute; bottom: 4px; right: 4px; }
 </style>
 </head>
 <body>
 
 <h1>🐶2026 Calendar 💉</h1>
+<div class="month-label-container" id="month-label">2月</div>
 
-<div id="all-months"></div>
+<div class="weekday-row">
+  <div class="weekday">Mon</div>
+  <div class="weekday">Tue</div>
+  <div class="weekday">Wed</div>
+  <div class="weekday">Thu</div>
+  <div class="weekday">Fri</div>
+  <div class="weekday">Sat</div>
+  <div class="weekday">Sun</div>
+</div>
+
+<div id="calendar" class="calendar"></div>
 
 <script>
 const year = 2026;
+const calendarDiv = document.getElementById('calendar');
+const monthLabelDiv = document.getElementById('month-label');
 
-// 各月のデータ（例：2〜8月）
+// 月ごとの日数・スケジュール
 const monthData = {
   2: { days:28, schedule:{1:'日勤',2:'日勤',3:'研修',4:'夜勤入り',5:'休み',6:'休み',7:'日勤',8:'日勤',9:'休み',10:'休み',11:'日勤',12:'夜勤入り',13:'夜勤入り',14:'日勤',15:'日勤',16:'日勤',17:'日勤',18:'日勤',19:'休み',20:'休み',21:'日勤'} },
   3: { days:31, schedule:{} },
@@ -102,16 +126,14 @@ const monthData = {
   8: { days:31, schedule:{} }
 };
 
-// スタンプ 💚こうみ 💙あき 💖デート
+// スタンプ 💚💙💖
 const stamps = {
   2:{1:'💚',2:'💚',5:'💙',6:'💙',14:'💖'},
   3:{},4:{},5:{},6:{},7:{},8:{}
 };
 
-// 簡易祝日（例：建国記念日 2/11）
-const holidays = {
-  2:[11],3:[],4:[],5:[],6:[],7:[],8:[]
-};
+// 簡易祝日
+const holidays = {2:[11],3:[],4:[],5:[],6:[],7:[],8:[]};
 
 function judge(day, schedule){
   const today = schedule[day];
@@ -122,42 +144,17 @@ function judge(day, schedule){
   return '';
 }
 
-const allMonthsDiv = document.getElementById('all-months');
+let firstTodayCell = null;
+const monthCells = []; // 月ごとの最初のセル記録
 
 for(const monthNum in monthData){
   const month = monthData[monthNum];
-  const monthDiv = document.createElement('div');
-  monthDiv.className = 'month';
-
-  const title = document.createElement('h2');
-  title.textContent = `${monthNum}月`;
-  monthDiv.appendChild(title);
-
-  const calendar = document.createElement('div');
-  calendar.className = 'calendar';
-
-  // 曜日表示
-  const weekdays = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  weekdays.forEach(day=>{
-    const wd = document.createElement('div');
-    wd.className = 'weekday';
-    wd.textContent = day;
-    calendar.appendChild(wd);
-  });
-
-  // 月初空白
   const firstDay = new Date(year, monthNum-1,1).getDay();
   const startDay = (firstDay+6)%7; // 月曜始まり
-  for(let i=0;i<startDay;i++){
-    const emptyCell = document.createElement('div');
-    emptyCell.className = 'cell empty';
-    calendar.appendChild(emptyCell);
-  }
 
-  // 各日
   for(let day=1; day<=month.days; day++){
     const cell = document.createElement('div');
-    cell.className = 'cell';
+    cell.className='cell';
 
     const weekdayIndex = (startDay+day-1)%7;
     if(weekdayIndex===5) cell.classList.add('sat');
@@ -167,23 +164,49 @@ for(const monthNum in monthData){
     const mark = judge(day, month.schedule);
     const work = month.schedule[day] || '';
 
-    // today判定
     const now = new Date();
     const isToday = now.getFullYear()===year && now.getMonth()===(monthNum-1) && now.getDate()===day;
-    if(isToday) cell.classList.add('today');
+    if(isToday){
+      cell.classList.add('today');
+      if(!firstTodayCell) firstTodayCell = cell;
+    }
 
-    cell.innerHTML = `
+    cell.innerHTML=`
       <div class="date">${day}</div>
       <div class="mark ${mark==='○'?'circle':'cross'}">${mark}</div>
       <div class="work">${work}</div>
       ${stamps[monthNum] && stamps[monthNum][day]?`<div class="stamp">${stamps[monthNum][day]}</div>`:''}
     `;
-    calendar.appendChild(cell);
-  }
 
-  monthDiv.appendChild(calendar);
-  allMonthsDiv.appendChild(monthDiv);
+    calendarDiv.appendChild(cell);
+
+    // 月最初のセル記録
+    if(day===1) monthCells.push({month: monthNum, cell});
+  }
 }
+
+// IntersectionObserverで月ラベル切替
+const observerOptions = {root:null, rootMargin:'0px', threshold:0.1};
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      monthLabelDiv.textContent = `${entry.target.dataset.month}月`;
+    }
+  });
+}, observerOptions);
+
+monthCells.forEach(item=>{
+  item.cell.dataset.month = item.month;
+  observer.observe(item.cell);
+});
+
+// ページ読み込み時にtodayが中央に来るようスクロール
+window.onload = function(){
+  if(firstTodayCell){
+    const y = firstTodayCell.getBoundingClientRect().top + window.scrollY - window.innerHeight/2 + firstTodayCell.offsetHeight/2;
+    window.scrollTo({top:y, behavior:'smooth'});
+  }
+};
 </script>
 
 </body>
