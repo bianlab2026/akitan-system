@@ -8,23 +8,23 @@
     font-family: system-ui, sans-serif;
     background: #44CAD1;
     color: #000;
-    padding: 10px;
     margin: 0;
+    padding: 10px;
   }
 
   h1 {
     text-align: center;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
+    font-size: 22px;
     letter-spacing: 1px;
-    font-size: clamp(18px, 4vw, 28px); /* 画面幅に応じて拡縮 */
   }
 
   .calendar {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
-    width: 100%;
-    max-width: 700px;
+    grid-template-columns: repeat(7, 1fr); /* 横7列固定 */
+    gap: 4px;
+    width: 100%;  /* 画面いっぱい */
+    max-width: 100%; 
     margin: 0 auto;
   }
 
@@ -32,46 +32,41 @@
     text-align: center;
     font-weight: bold;
     padding: 6px 0;
-    border-radius: 8px;
+    border-radius: 6px;
     color: #fff;
     background: #000;
-    font-size: clamp(12px, 2.5vw, 16px);
+    font-size: 12px;
   }
 
   .cell {
     background: #fff;
-    border-radius: 10px;
-    padding: 8px 4px;
+    border-radius: 8px;
+    padding: 8px 4px; /* 少し大きめ */
     text-align: center;
-    min-height: 70px;
+    min-height: 90px; /* 高さ確保 */
     position: relative;
-    font-size: clamp(10px, 2vw, 14px);
+    font-size: 13px;
   }
 
+  /* 土日・祝日色分け */
   .cell.sat { background: #e0e0ff; }
   .cell.sun { background: #ffe0e0; }
   .cell.holiday { background: #fff2cc; }
 
   .today {
-    border: 3px solid #ff9800;
-    box-shadow: 0 0 10px rgba(255,152,0,0.7);
+    border: 2px solid #ff9800;
+    box-shadow: 0 0 8px rgba(255,152,0,0.7);
     transform: scale(1.03);
   }
 
   .date { font-weight: bold; margin-bottom: 4px; }
-  .mark { font-size: 18px; margin-bottom: 4px; }
+  .mark { font-size: 16px; margin-bottom: 2px; }
   .circle { color: #4caf50; }
   .cross { color: #f44336; }
   .work { font-size: 12px; opacity: 0.85; }
-  .stamp { font-size: 16px; position: absolute; bottom: 3px; right: 3px; }
+  .stamp { font-size: 16px; position: absolute; bottom: 2px; right: 2px; }
 
   .empty { background: transparent; }
-
-  /* スマホ用微調整 */
-  @media (max-width: 500px) {
-    .cell { min-height: 60px; padding: 6px 2px; }
-    .stamp { font-size: 14px; }
-  }
 </style>
 </head>
 <body>
@@ -87,8 +82,9 @@ const schedule = {
   19:'休み',20:'休み',21:'日勤'
 };
 
+// スタンプ 💚こうみ 💙あき 💖デート
 const stamps = {
-  1:'🏠こうみ家',2:'🏠こうみ家',5:'🏠あき家',6:'🏠あき家',14:'💖デート'
+  1:'💚こうみ',2:'💚こうみ',5:'💙あき',6:'💙あき',14:'💖デート'
 };
 
 const year = 2026;
