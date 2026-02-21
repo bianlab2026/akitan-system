@@ -153,7 +153,7 @@ function judge(day, schedule){
   const today = schedule[day];
   const next = schedule[day+1];
   if(!today) return '';
-  if((next==='休み')||(next==='休み')||(next==='研修')) return '○';
+  if(next==='休み'||next==='研修') return '○';
   if(next==='日勤'||next==='夜勤入り') return '×';
   return '';
 }
